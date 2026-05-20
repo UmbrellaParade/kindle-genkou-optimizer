@@ -113,6 +113,36 @@ function renderCheckResult({ stats, issues }) {
   document.getElementById("check-result").scrollIntoView({ behavior: "smooth" });
 }
 
+// ===== プレビュー =====
+document.getElementById("preview-btn").addEventListener("click", async () => {
+  const file = document.getElementById("convert-file").files[0];
+  if (!file) { alert("先に原稿ファイルを選択してください"); return; }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  showLoading();
+
+  try {
+    const res = await fetch("/api/preview", { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.error) { alert("エラー: " + data.error); return; }
+    document.getElementById("preview-content").innerHTML = data.html;
+    document.getElementById("preview-modal").classList.remove("hidden");
+  } catch (err) {
+    alert("通信エラーが発生しました");
+  } finally {
+    hideLoading();
+  }
+});
+
+function closePreview() {
+  document.getElementById("preview-modal").classList.add("hidden");
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closePreview();
+});
+
 // ===== EPUB変換 =====
 document.getElementById("convert-form").addEventListener("submit", async e => {
   e.preventDefault();

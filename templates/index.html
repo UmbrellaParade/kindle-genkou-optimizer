@@ -144,7 +144,10 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-primary">EPUBを生成してダウンロード</button>
+          <div class="btn-group">
+            <button type="button" id="preview-btn" class="btn-secondary">👁️ プレビュー確認</button>
+            <button type="submit" class="btn-primary">📥 EPUBをダウンロード</button>
+          </div>
         </form>
       </div>
 
@@ -159,6 +162,20 @@
       </div>
     </section>
   </main>
+
+  <!-- プレビューモーダル -->
+  <div id="preview-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="closePreview()"></div>
+    <div class="modal-window">
+      <div class="modal-header">
+        <span>📖 原稿プレビュー（Kindle表示イメージ）</span>
+        <button class="modal-close" onclick="closePreview()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="preview-content" class="kindle-preview"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="loading" class="loading hidden">
     <div class="spinner"></div>

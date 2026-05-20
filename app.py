@@ -64,6 +64,26 @@ def api_check():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/preview", methods=["POST"])
+def api_preview():
+    if "file" not in request.files:
+        return jsonify({"error": "ファイルが選択されていません"}), 400
+    file = request.files["file"]
+    if not file.filename or not allowed_file(file.filename):
+        return jsonify({"error": "対応していないファイル形式です（.md / .txt / .docx）"}), 400
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    file.save(filepath)
+
+    ext = filename.rsplit(".", 1)[1].lower()
+    try:
+        html_content = get_html(filepath, ext)
+        return jsonify({"html": html_content})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/convert", methods=["POST"])
 def api_convert():
     if "file" not in request.files:
