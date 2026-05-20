@@ -1,3 +1,35 @@
+// ===== メタデータの自動保存・復元 =====
+const SAVE_FIELDS = ["title", "author", "publisher", "language", "description", "chars_per_page"];
+
+function saveFormData() {
+  const data = {};
+  SAVE_FIELDS.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el) data[name] = el.value;
+  });
+  localStorage.setItem("kindle_metadata", JSON.stringify(data));
+}
+
+function loadFormData() {
+  const raw = localStorage.getItem("kindle_metadata");
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  SAVE_FIELDS.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el && data[name] !== undefined) el.value = data[name];
+  });
+}
+
+// ページ読み込み時に復元
+document.addEventListener("DOMContentLoaded", () => {
+  loadFormData();
+  // 入力のたびに自動保存
+  SAVE_FIELDS.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (el) el.addEventListener("input", saveFormData);
+  });
+});
+
 // タブ切り替え
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
