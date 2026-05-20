@@ -175,6 +175,63 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") closePreview();
 });
 
+// ===== 自動整形 =====
+bindFileInput("format-file", "format-filename");
+
+let formattedFilename = null;
+
+document.getElementById("format-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const file = document.getElementById("format-file").files[0];
+  if (!file) { alert("ファイルを選択してください"); return; }
+
+  const formData = new FormData(e.target);
+  showLoading();
+
+  try {
+    const res = await fetch("/api/format", { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.error) { alert("エラー: " + data.error); return; }
+
+    document.getElementById("format-before").innerHTML = data.before;
+    document.getElementById("format-after").innerHTML = data.after;
+    formattedFilename = data.out_filename;
+
+    document.getElementById("format-result").classList.remove("hidden");
+    document.getElementById("format-result").scrollIntoView({ behavior: "smooth" });
+
+    // 切り替えボタンをリセット
+    document.querySelectorAll(".preview-toggle-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector('[data-side="after"]').classList.add("active");
+    document.getElementById("format-after").classList.remove("hidden");
+    document.getElementById("format-before").classList.add("hidden");
+  } catch (err) {
+    alert("通信エラーが発生しました");
+  } finally {
+    hideLoading();
+  }
+});
+
+// 整形前/後 切り替え
+document.querySelectorAll(".preview-toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".preview-toggle-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const side = btn.dataset.side;
+    document.getElementById("format-before").classList.toggle("hidden", side !== "before");
+    document.getElementById("format-after").classList.toggle("hidden", side !== "after");
+  });
+});
+
+// 整形済みファイルをダウンロード
+document.getElementById("download-formatted-btn").addEventListener("click", () => {
+  if (!formattedFilename) return;
+  const a = document.createElement("a");
+  a.href = `/api/download-formatted/${encodeURIComponent(formattedFilename)}`;
+  a.download = formattedFilename;
+  a.click();
+});
+
 // ===== EPUB変換 =====
 document.getElementById("convert-form").addEventListener("submit", async e => {
   e.preventDefault();

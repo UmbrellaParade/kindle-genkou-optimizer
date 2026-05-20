@@ -16,6 +16,7 @@
     <!-- タブナビゲーション -->
     <nav class="tabs">
       <button class="tab-btn active" data-tab="check">📊 文字数・品質チェック</button>
+      <button class="tab-btn" data-tab="format">✨ 自動整形</button>
       <button class="tab-btn" data-tab="convert">📖 EPUB変換</button>
     </nav>
 
@@ -82,7 +83,90 @@
       </div>
     </section>
 
-    <!-- タブ2: 変換 -->
+    <!-- タブ2: 自動整形 -->
+    <section id="tab-format" class="tab-content">
+      <div class="card">
+        <h2>自動整形</h2>
+        <p class="tab-desc">原稿をKindle向けに読みやすく自動修正します。整形前後をプレビューで確認してからダウンロードできます。</p>
+        <form id="format-form">
+          <div class="form-group">
+            <label>原稿ファイル <span class="badge">必須</span>（.md / .txt）</label>
+            <div class="file-drop">
+              <input type="file" id="format-file" name="file" accept=".md,.txt" hidden>
+              <div class="drop-area" onclick="document.getElementById('format-file').click()">
+                <span class="drop-icon">📄</span>
+                <p>クリックまたはドラッグ＆ドロップ</p>
+                <small>.md / .txt に対応</small>
+              </div>
+              <p id="format-filename" class="selected-file"></p>
+            </div>
+          </div>
+
+          <div class="separator">🔧 適用する整形を選択</div>
+          <div class="fix-options">
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="single_linebreak" checked>
+              <span class="toggle-box">
+                <span class="toggle-title">段落区切りの修正 <span class="badge badge-important">最重要</span></span>
+                <span class="toggle-desc">単独の改行を段落区切りに変換。Kindleで行間が詰まる問題を解決します</span>
+              </span>
+            </label>
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="excess_blank_lines" checked>
+              <span class="toggle-box">
+                <span class="toggle-title">連続する空行を圧縮</span>
+                <span class="toggle-desc">3行以上の空行を1行にまとめます</span>
+              </span>
+            </label>
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="trailing_spaces" checked>
+              <span class="toggle-box">
+                <span class="toggle-title">行末スペースを削除</span>
+                <span class="toggle-desc">行末の半角・全角スペースを削除します</span>
+              </span>
+            </label>
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="fullwidth_indent" checked>
+              <span class="toggle-box">
+                <span class="toggle-title">全角スペース字下げを削除</span>
+                <span class="toggle-desc">段落頭の「　」による字下げを削除（表示はCSSで自動処理）</span>
+              </span>
+            </label>
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="punctuation">
+              <span class="toggle-box">
+                <span class="toggle-title">記号を統一</span>
+                <span class="toggle-desc">「...」→「…」、連続する句読点をまとめます</span>
+              </span>
+            </label>
+            <label class="fix-toggle">
+              <input type="checkbox" name="fixes" value="space_around_latin">
+              <span class="toggle-box">
+                <span class="toggle-title">日本語と英数字の間にスペースを挿入</span>
+                <span class="toggle-desc">「Kindleで」→「Kindle で」のように読みやすくします</span>
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">整形してプレビュー</button>
+        </form>
+      </div>
+
+      <!-- 整形結果 -->
+      <div id="format-result" class="hidden">
+        <div class="card">
+          <div class="preview-toggle-bar">
+            <button class="preview-toggle-btn active" data-side="after">整形後</button>
+            <button class="preview-toggle-btn" data-side="before">整形前</button>
+          </div>
+          <div id="format-after" class="kindle-preview format-side"></div>
+          <div id="format-before" class="kindle-preview format-side hidden"></div>
+        </div>
+        <button id="download-formatted-btn" class="btn-primary">✅ この内容でファイルをダウンロード</button>
+      </div>
+    </section>
+
+    <!-- タブ3: 変換 -->
     <section id="tab-convert" class="tab-content">
       <div class="card">
         <h2>EPUB変換（Kindle向け）</h2>

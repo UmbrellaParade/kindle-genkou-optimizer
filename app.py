@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from modules.checker import analyze_text, extract_text_from_md, extract_text_from_docx
 from modules.proofreader import proofread
 from modules.converter import md_to_html, docx_to_html, create_epub
+from modules.formatter import apply_fixes, FIXES
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
@@ -62,6 +63,55 @@ def api_check():
         return jsonify({"stats": stats, "issues": issues})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/format", methods=["POST"])
+def api_format():
+    if "file" not in request.files:
+        return jsonify({"error": "ファイルが選択されていません"}), 400
+    file = request.files["file"]
+    if not file.filename or not allowed_file(file.filename):
+        return jsonify({"error": "対応していないファイル形式です（.md / .txt / .docx）"}), 400
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    file.save(filepath)
+
+    ext = filename.rsplit(".", 1)[1].lower()
+    selected_fixes = request.form.getlist("fixes")
+
+    try:
+        original = extract_text_from_md(filepath) if ext in ("md", "txt") else extract_text_from_docx(filepath)
+
+        # .docx の場合は元のMarkdownテキストとして扱えないのでMD変換は行わない
+        if ext == "docx":
+            return jsonify({"error": ".docx は整形機能に対応していません。先に .md または .txt で保存してください"}), 400
+
+        with open(filepath, encoding="utf-8") as f:
+            raw = f.read()
+
+        fixed = apply_fixes(raw, selected_fixes)
+
+        # 整形済みファイルを保存してダウンロード用パスを返す
+        out_filename = f"formatted_{filename}"
+        out_path = os.path.join(app.config["OUTPUT_FOLDER"], out_filename)
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(fixed)
+
+        before_html = md_to_html(raw)
+        after_html = md_to_html(fixed)
+
+        return jsonify({"before": before_html, "after": after_html, "out_filename": out_filename})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/download-formatted/<filename>")
+def download_formatted(filename):
+    path = os.path.join(app.config["OUTPUT_FOLDER"], secure_filename(filename))
+    if not os.path.exists(path):
+        return "ファイルが見つかりません", 404
+    return send_file(path, as_attachment=True, download_name=filename)
 
 
 @app.route("/api/preview", methods=["POST"])

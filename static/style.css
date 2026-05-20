@@ -395,6 +395,97 @@ tr:hover td { background: #fffbf5; }
   font-size: 0.9em;
 }
 
+/* 自動整形タブ */
+.tab-desc {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+}
+
+.fix-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.fix-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fix-toggle:hover { border-color: #ff9900; background: #fffbf5; }
+
+.fix-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #ff9900;
+  flex-shrink: 0;
+}
+
+.fix-toggle input:checked + .toggle-box { color: #333; }
+
+.toggle-box { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.toggle-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.toggle-desc {
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.4;
+}
+
+.badge-important {
+  background: #e65100;
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
+/* 整形結果 プレビュー切り替え */
+.preview-toggle-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.8rem;
+}
+
+.preview-toggle-btn {
+  padding: 0.4rem 1.2rem;
+  border: 1.5px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  color: #888;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.preview-toggle-btn.active {
+  background: #ff9900;
+  border-color: #ff9900;
+  color: white;
+}
+
+.format-side { max-height: 480px; overflow-y: auto; padding: 0.5rem; }
+
+#download-formatted-btn { margin-top: 0; }
+
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { grid-template-columns: 1fr; }
