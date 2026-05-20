@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kindle原稿最適化ツール</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>📚 Kindle原稿最適化ツール</h1>
+    <p>Markdown / Word (.docx) をKindle向けに最適化・変換します</p>
+  </header>
+
+  <main>
+    <!-- タブナビゲーション -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="check">📊 文字数・品質チェック</button>
+      <button class="tab-btn" data-tab="convert">📖 EPUB変換</button>
+    </nav>
+
+    <!-- タブ1: チェック -->
+    <section id="tab-check" class="tab-content active">
+      <div class="card">
+        <h2>原稿チェック</h2>
+        <form id="check-form">
+          <div class="form-group">
+            <label>原稿ファイル <span class="badge">必須</span></label>
+            <div class="file-drop" id="check-drop">
+              <input type="file" id="check-file" name="file" accept=".md,.txt,.docx" hidden>
+              <div class="drop-area" onclick="document.getElementById('check-file').click()">
+                <span class="drop-icon">📄</span>
+                <p>クリックまたはドラッグ＆ドロップ</p>
+                <small>.md / .txt / .docx に対応</small>
+              </div>
+              <p id="check-filename" class="selected-file"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>1ページあたりの文字数（Kindle推奨: 400字）</label>
+            <input type="number" id="chars-per-page" name="chars_per_page" value="400" min="100" max="1000">
+          </div>
+          <button type="submit" class="btn-primary">チェック実行</button>
+        </form>
+      </div>
+
+      <div id="check-result" class="result-area hidden">
+        <!-- 統計カード -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">総文字数（空白除く）</div>
+            <div class="stat-value" id="stat-chars">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">推定ページ数</div>
+            <div class="stat-value" id="stat-pages">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">文の数</div>
+            <div class="stat-value" id="stat-sentences">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">行数</div>
+            <div class="stat-value" id="stat-lines">—</div>
+          </div>
+        </div>
+
+        <!-- 章別一覧 -->
+        <div class="card" id="chapters-section">
+          <h3>章別文字数</h3>
+          <table id="chapter-table">
+            <thead><tr><th>章タイトル</th><th>文字数</th></tr></thead>
+            <tbody id="chapter-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 品質チェック -->
+        <div class="card">
+          <h3>品質チェック結果</h3>
+          <div id="issues-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- タブ2: 変換 -->
+    <section id="tab-convert" class="tab-content">
+      <div class="card">
+        <h2>EPUB変換（Kindle向け）</h2>
+        <form id="convert-form" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>原稿ファイル <span class="badge">必須</span></label>
+            <div class="file-drop">
+              <input type="file" id="convert-file" name="file" accept=".md,.txt,.docx" hidden>
+              <div class="drop-area" onclick="document.getElementById('convert-file').click()">
+                <span class="drop-icon">📄</span>
+                <p>クリックまたはドラッグ＆ドロップ</p>
+                <small>.md / .txt / .docx に対応</small>
+              </div>
+              <p id="convert-filename" class="selected-file"></p>
+            </div>
+          </div>
+
+          <div class="separator">📋 書籍メタデータ</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>タイトル <span class="badge">必須</span></label>
+              <input type="text" name="title" placeholder="例: 副業で月10万円達成する方法" required>
+            </div>
+            <div class="form-group">
+              <label>著者名 <span class="badge">必須</span></label>
+              <input type="text" name="author" placeholder="例: 山田 太郎" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>出版社・ブランド名</label>
+              <input type="text" name="publisher" placeholder="例: ○○出版">
+            </div>
+            <div class="form-group">
+              <label>言語</label>
+              <select name="language">
+                <option value="ja" selected>日本語</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>書籍の説明文（KDP販売ページ用）</label>
+            <textarea name="description" rows="4" placeholder="Kindleの販売ページに表示される説明文を入力してください..."></textarea>
+          </div>
+
+          <div class="separator">🖼️ 表紙画像（任意）</div>
+          <div class="form-group">
+            <label>表紙画像</label>
+            <div class="file-drop">
+              <input type="file" id="cover-file" name="cover" accept=".jpg,.jpeg,.png" hidden>
+              <div class="drop-area" onclick="document.getElementById('cover-file').click()">
+                <span class="drop-icon">🖼️</span>
+                <p>クリックして表紙画像を選択</p>
+                <small>推奨: 2560×1600px、JPG/PNG、2500px以上の長辺</small>
+              </div>
+              <p id="cover-filename" class="selected-file"></p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">EPUBを生成してダウンロード</button>
+        </form>
+      </div>
+
+      <div class="card info-card">
+        <h3>💡 KDP（Kindle Direct Publishing）入稿のポイント</h3>
+        <ul>
+          <li>Amazonは現在 <strong>EPUB形式を推奨</strong>（MOBIは廃止予定）</li>
+          <li>表紙画像の推奨サイズ: <strong>2560×1600px（比率1.6:1）</strong></li>
+          <li>最低解像度: 1000×625px（長辺1000px以上）</li>
+          <li>生成したEPUBをKDP管理画面でそのまま入稿できます</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <p>処理中...</p>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
