@@ -486,9 +486,154 @@ tr:hover td { background: #fffbf5; }
 
 #download-formatted-btn { margin-top: 0; }
 
+/* ===== KDP確認タブ ===== */
+
+/* 目次ツリー */
+.toc-tree { padding: 0.5rem 0; }
+
+.toc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed #eee;
+  font-size: 0.9rem;
+}
+
+.toc-item .toc-level {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  background: #ff9900;
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+.toc-item[data-level="2"] { padding-left: 1.5rem; }
+.toc-item[data-level="3"] { padding-left: 3rem; }
+.toc-item[data-level="4"] { padding-left: 4.5rem; }
+.toc-item[data-level="2"] .toc-level { background: #aaa; }
+.toc-item[data-level="3"] .toc-level { background: #ccc; color: #555; }
+
+.toc-title { color: #333; }
+
+/* チェックリスト（表紙） */
+.check-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.3rem; }
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.check-item.ok   { background: #e8f5e9; color: #2e7d32; }
+.check-item.warn { background: #fff8e1; color: #f57f17; }
+.check-item.fail { background: #ffebee; color: #c62828; }
+
+.check-icon { font-size: 1rem; flex-shrink: 0; }
+
+.cover-badge {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+.cover-badge.pass { background: #4caf50; color: white; }
+.cover-badge.fail { background: #e53935; color: white; }
+
+/* 説明文HTML生成 */
+.md-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.md-hint code {
+  background: #f0f0f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.desc-output-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.desc-col-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.desc-html-box {
+  position: relative;
+  background: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.desc-html-box pre {
+  color: #d4d4d4;
+  font-size: 0.8rem;
+  padding: 1rem;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #444;
+  color: #eee;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-btn:hover { background: #666; }
+.copy-btn.copied { background: #4caf50; color: white; }
+
+.desc-preview-box {
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-height: 340px;
+  overflow-y: auto;
+  color: #222;
+}
+
+.desc-preview-box h4 { font-size: 1.1rem; margin: 0.8rem 0 0.4rem; }
+.desc-preview-box h5 { font-size: 1rem;   margin: 0.7rem 0 0.3rem; }
+.desc-preview-box h6 { font-size: 0.95rem; margin: 0.6rem 0 0.3rem; color: #555; }
+.desc-preview-box ul { padding-left: 1.2rem; margin: 0.4rem 0; }
+.desc-preview-box li { margin-bottom: 0.3rem; }
+.desc-preview-box p  { margin: 0.4rem 0; }
+
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { grid-template-columns: 1fr; }
   .btn-group { grid-template-columns: 1fr; }
   .modal-body { padding: 1.2rem; }
+  .desc-output-wrap { grid-template-columns: 1fr; }
 }

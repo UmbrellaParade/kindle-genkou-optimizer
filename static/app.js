@@ -145,6 +145,133 @@ function renderCheckResult({ stats, issues }) {
   document.getElementById("check-result").scrollIntoView({ behavior: "smooth" });
 }
 
+// ===== KDP確認: 目次チェック =====
+bindFileInput("toc-file", "toc-filename");
+
+document.getElementById("toc-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const file = document.getElementById("toc-file").files[0];
+  if (!file) { alert("ファイルを選択してください"); return; }
+
+  const formData = new FormData(e.target);
+  showLoading();
+  try {
+    const res = await fetch("/api/toc-check", { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.error) { alert("エラー: " + data.error); return; }
+    renderTocResult(data);
+  } catch (err) {
+    alert("通信エラーが発生しました");
+  } finally {
+    hideLoading();
+  }
+});
+
+function renderTocResult({ issues, warnings, tree }) {
+  const issuesEl = document.getElementById("toc-issues");
+  issuesEl.innerHTML = "";
+
+  issues.forEach(msg => {
+    issuesEl.innerHTML += `<div class="issue-item error"><div class="issue-title">🔴 ${msg}</div></div>`;
+  });
+  warnings.forEach(msg => {
+    issuesEl.innerHTML += `<div class="issue-item warning"><div class="issue-title">🟡 ${msg}</div></div>`;
+  });
+  if (!issues.length && !warnings.length) {
+    issuesEl.innerHTML = '<p class="no-issues">✅ 見出し構造に問題はありません</p>';
+  }
+
+  const treeWrap = document.getElementById("toc-tree-wrap");
+  const treeEl = document.getElementById("toc-tree");
+  treeEl.innerHTML = "";
+  if (tree && tree.length) {
+    treeWrap.classList.remove("hidden");
+    tree.forEach(h => {
+      const div = document.createElement("div");
+      div.className = "toc-item";
+      div.dataset.level = h.level;
+      div.innerHTML = `<span class="toc-level">H${h.level}</span><span class="toc-title">${h.title}</span>`;
+      treeEl.appendChild(div);
+    });
+  } else {
+    treeWrap.classList.add("hidden");
+  }
+
+  document.getElementById("toc-result").classList.remove("hidden");
+}
+
+// ===== KDP確認: 表紙サイズチェック =====
+bindFileInput("cover-check-file", "cover-check-filename");
+
+document.getElementById("cover-check-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const file = document.getElementById("cover-check-file").files[0];
+  if (!file) { alert("画像ファイルを選択してください"); return; }
+
+  const formData = new FormData(e.target);
+  showLoading();
+  try {
+    const res = await fetch("/api/cover-check", { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.error) { alert("エラー: " + data.error); return; }
+    renderCoverResult(data);
+  } catch (err) {
+    alert("通信エラーが発生しました");
+  } finally {
+    hideLoading();
+  }
+});
+
+function renderCoverResult({ passed, width, height, checks }) {
+  const badgeEl = document.getElementById("cover-badge");
+  badgeEl.innerHTML = passed
+    ? `<span class="cover-badge pass">✅ KDP規定をクリア（${width} × ${height} px）</span>`
+    : `<span class="cover-badge fail">❌ 規定を満たしていません（${width} × ${height} px）</span>`;
+
+  const checksEl = document.getElementById("cover-checks");
+  checksEl.innerHTML = "";
+  checks.forEach(c => {
+    const cls  = c.ok === true ? "ok" : c.ok === false ? "fail" : "warn";
+    const icon = c.ok === true ? "✅" : c.ok === false ? "❌" : "⚠️";
+    checksEl.innerHTML += `<div class="check-item ${cls}"><span class="check-icon">${icon}</span>${c.msg}</div>`;
+  });
+
+  document.getElementById("cover-result").classList.remove("hidden");
+}
+
+// ===== KDP確認: 説明文HTML生成 =====
+document.getElementById("desc-gen-btn").addEventListener("click", async () => {
+  const text = document.getElementById("desc-input").value.trim();
+  if (!text) { alert("説明文を入力してください"); return; }
+
+  const formData = new FormData();
+  formData.append("description", text);
+  showLoading();
+  try {
+    const res = await fetch("/api/description-html", { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.error) { alert("エラー: " + data.error); return; }
+
+    document.getElementById("desc-html-output").textContent = data.html;
+    document.getElementById("desc-preview").innerHTML = data.html;
+    document.getElementById("desc-result").classList.remove("hidden");
+  } catch (err) {
+    alert("通信エラーが発生しました");
+  } finally {
+    hideLoading();
+  }
+});
+
+document.getElementById("copy-html-btn").addEventListener("click", () => {
+  const html = document.getElementById("desc-html-output").textContent;
+  navigator.clipboard.writeText(html).then(() => {
+    const btn = document.getElementById("copy-html-btn");
+    btn.textContent = "✅ コピーしました";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "📋 コピー"; btn.classList.remove("copied"); }, 2000);
+  });
+});
+
 // ===== プレビュー =====
 document.getElementById("preview-btn").addEventListener("click", async () => {
   const file = document.getElementById("convert-file").files[0];

@@ -17,6 +17,7 @@
     <nav class="tabs">
       <button class="tab-btn active" data-tab="check">📊 文字数・品質チェック</button>
       <button class="tab-btn" data-tab="format">✨ 自動整形</button>
+      <button class="tab-btn" data-tab="kdp">🔍 KDP確認</button>
       <button class="tab-btn" data-tab="convert">📖 EPUB変換</button>
     </nav>
 
@@ -166,7 +167,101 @@
       </div>
     </section>
 
-    <!-- タブ3: 変換 -->
+    <!-- タブ3: KDP確認 -->
+    <section id="tab-kdp" class="tab-content">
+
+      <!-- 目次チェック -->
+      <div class="card">
+        <h2>📋 目次構造チェック</h2>
+        <p class="tab-desc">見出し（H1〜H3）の階層が正しいか確認し、Kindleの目次が正しく生成されるか検証します。</p>
+        <form id="toc-form">
+          <div class="form-group">
+            <label>原稿ファイル <span class="badge">必須</span></label>
+            <div class="file-drop">
+              <input type="file" id="toc-file" name="file" accept=".md,.txt,.docx" hidden>
+              <div class="drop-area" onclick="document.getElementById('toc-file').click()">
+                <span class="drop-icon">📄</span>
+                <p>クリックまたはドラッグ＆ドロップ</p>
+              </div>
+              <p id="toc-filename" class="selected-file"></p>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">目次をチェック</button>
+        </form>
+        <div id="toc-result" class="hidden" style="margin-top:1.2rem">
+          <div id="toc-issues"></div>
+          <div id="toc-tree-wrap" class="hidden">
+            <h3 style="margin-bottom:0.8rem">生成される目次プレビュー</h3>
+            <div id="toc-tree" class="toc-tree"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表紙サイズチェック -->
+      <div class="card">
+        <h2>🖼️ 表紙サイズチェック</h2>
+        <p class="tab-desc">KDP規定（最低 625×1000px、推奨 1600×2560px、縦横比 1.6:1）を満たしているか確認します。</p>
+        <form id="cover-check-form">
+          <div class="form-group">
+            <label>表紙画像 <span class="badge">必須</span></label>
+            <div class="file-drop">
+              <input type="file" id="cover-check-file" name="cover" accept=".jpg,.jpeg,.png" hidden>
+              <div class="drop-area" onclick="document.getElementById('cover-check-file').click()">
+                <span class="drop-icon">🖼️</span>
+                <p>クリックして画像を選択</p>
+                <small>JPG / PNG</small>
+              </div>
+              <p id="cover-check-filename" class="selected-file"></p>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">サイズをチェック</button>
+        </form>
+        <div id="cover-result" class="hidden" style="margin-top:1.2rem">
+          <div id="cover-badge"></div>
+          <div id="cover-checks" class="check-list"></div>
+        </div>
+      </div>
+
+      <!-- 説明文HTML生成 -->
+      <div class="card">
+        <h2>✍️ 説明文HTML生成</h2>
+        <p class="tab-desc">KDPの販売ページ用説明文を見栄えよく整形します。マークダウン記法（**太字**、*斜体*、- リスト、## 小見出し）が使えます。</p>
+        <div class="desc-editor">
+          <div class="form-group">
+            <label>説明文（マークダウン記法OK）</label>
+            <div class="md-hint">
+              <code>**太字**</code>　<code>*斜体*</code>　<code>- リスト</code>　<code>## 小見出し</code>
+            </div>
+            <textarea id="desc-input" rows="8" placeholder="例:
+## この本で得られること
+- 副業で月10万円を達成する具体的なステップ
+- **初心者でも始められる**スキル不要の方法
+- 失敗しないための注意点と実例
+
+この本は会社員として働きながら..."></textarea>
+          </div>
+          <button id="desc-gen-btn" class="btn-primary">HTMLを生成</button>
+        </div>
+        <div id="desc-result" class="hidden" style="margin-top:1.5rem">
+          <div class="desc-output-wrap">
+            <div class="desc-col">
+              <div class="desc-col-label">KDP用HTML（コピーして貼り付け）</div>
+              <div class="desc-html-box">
+                <pre id="desc-html-output"></pre>
+                <button id="copy-html-btn" class="copy-btn">📋 コピー</button>
+              </div>
+            </div>
+            <div class="desc-col">
+              <div class="desc-col-label">プレビュー</div>
+              <div id="desc-preview" class="desc-preview-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- タブ4: 変換 -->
     <section id="tab-convert" class="tab-content">
       <div class="card">
         <h2>EPUB変換（Kindle向け）</h2>
